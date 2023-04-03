@@ -9,7 +9,7 @@ app = Flask(__name__)
 def indexfun():
     allimages = []
     
-    for fileName in os.listdir(r'C:\Users\Lenovo\WebDevelopment\My gallery\static'):
+    for fileName in os.listdir(r'static'):
         allimages.append(os.path.join(fileName))
     
     return render_template("index.html",imageList=allimages)
