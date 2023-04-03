@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- In the HTML head section, you can add the following meta tag to reload the page after 1 second: -->
+    <!-- <meta http-equiv="refresh" content="1"> -->
+    <!-- This will automatically refresh the page after 1 second, so that the newly uploaded image appears in the gallery.-->
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Viewer</title>
+    <style>
+        *{
+            padding:0;
+            margin:0;
+            box-sizing: border-box;
+        }
+        .details{
+            height:350px;
+            width: 300px;
+            margin:30px;
+            position:relative;
+            overflow: hidden;
+        }
+        .details img{
+            height:350px;
+            width:300px;
+            display: block; 
+            flex-basis: 25%;
+            box-sizing: border-box;
+            border-radius: 5px;
+            cursor:pointer;
+            transition:0.8s linear;
+            border:8px solid skyblue;
+        }
+
+        i{
+            outline: none;
+            border:none;
+            cursor:pointer;
+            color:white;
+            transition:bottom 0.4s ease;
+        }
+       
+        .details:hover img{
+            transform: scale(1.1);
+        }
+        .details:hover .bottom{
+            bottom:0;
+        }
+
+        .modal{
+            background-color: yellow;
+            height: 100px;
+            width: 100px;
+        }
+
+        input{
+            display:none;
+        }
+
+        .uploadButton{
+            padding:12px 12px;
+            border-radius: 5px;
+            color:skyblue;
+            background:none;
+            cursor:pointer;
+            font-weight: bold;
+            transition: 0.8s;
+            border-color:skyblue; 
+            transition:box-shadow 0.2s ease;
+            margin:10px;
+        }
+
+        .uploadButton:hover{
+            color:white;
+            background-color: skyblue;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 255, 0.5);
+        }
+
+        .one{
+            display:flex;
+            justify-content: space-between;
+            align-items: center;
+            margin:30px;
+            color:skyblue;
+            font-size:30px;
+            font-family:Georgia, 'Times New Roman', Times, serif;
+        }
+
+        .images{
+            display:flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .bottom{
+            background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            width:100%;
+            position:absolute;
+            bottom:-100px;
+        }
+
+        .bottom button{
+            background:none;
+            outline:none;
+            border:none;
+            font-size: 1.6rem;
+            padding-left:10px;
+            padding-bottom: 12px;
+        }
+
+        .pop-up{
+            position:fixed;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,.9);
+            top:0;
+            display:none;
+        }
+
+        .pop-up img{
+            border-radius: 5px;
+            border:7px solid white;
+            position:absolute;
+            width:750px;
+            height:500px;
+            object-fit: cover;
+            top:50%;
+            left:50%;
+            transform: translate(-50%,-50%);
+        }
+
+        .pop-up span{
+            color:white;
+            font-size:60px;
+            font-weight: bolder;
+            position:absolute;
+            right:10px;
+            top:0;
+            cursor: pointer;
+        }
+
+        @media (max-width:768px) {
+            .pop-up img{
+                width:95%;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+</head>
+<body>
+    <section class="one">
+
+        <h1>Photo Gallery</h1>
+
+    <button class="uploadButton">
+        <label for="input-file">Upload Images</label>
+        <input type="file" accept="image/png, image/jpg, image/jpeg" id="input-file">
+    </button>
+
+    </section>
+
+    <section class="images">
+
+    <!-- We iterate through our static folder to check for existing images -->
+    {% for image in imageList %}
+        <div class="details" id="{{ image }}">
+
+            <img src="{{ url_for('static',filename=image) }}" alt="image">
+            
+            <div class="bottom" id="{{ image }}">
+                <a href="static/{{ image }}" download="download"><button><i class="uil uil-download-alt icon"></i></button></a>
+                <button class="delete" onclick="removefun(this.parentNode.id)"><i class="uil uil-trash-alt"></i></button>
+            </div>
+
+        </div>
+    {% endfor %}
+    </section>
+    <section class="two">
+            <!-- Pop-up image -->
+            <div class="pop-up">
+                <span>&times;</span>
+                <img src="" alt="">
+            </div>
+    </section>
+    <script>
+        let yourInput = document.getElementById("input-file");
+
+        let modal = document.getElementById("modalImage");
+        
+        let anchor = document.getElementById("modalAnchor");
+
+        let source = document.getElementsByClassName("images")[0];
+        
+        // CODE FOR DISPLAYING IMAGES IN FRONT END
+        yourInput.onchange = async function(){
+
+            const file = yourInput.files[0];
+
+            const formData = new FormData();
+            formData.append('file',file)
+            const response =  await fetch('/upload', {
+                method:'POST',
+                body:formData
+            });
+
+            if(response.ok)
+            {
+
+                const ele = document.createElement('div');
+                ele.classList.add('details');
+                ele.setAttribute("id",file.name);
+
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(yourInput.files[0]);
+                img.onclick = () => {
+                    {
+                        document.querySelector(".pop-up").style.display = 'block';
+                        document.querySelector(".pop-up img").src = img.getAttribute('src');
+                    }
+                };
+                ele.appendChild(img);
+
+                const div1 = document.createElement('div');
+                div1.classList.add('bottom');
+                div1.setAttribute("id",file.name); 
+                
+
+                div1.innerHTML += `<a href="${img.src}" id = "modalAnchor" download="download"><button><i class="uil uil-download-alt icon"></i></button></a>`;
+                div1.innerHTML += `<button class="delete" style="margin:10px" onclick="removefun(this.parentNode.id)"><i class="uil uil-trash-alt"></i></button>`;
+                ele.appendChild(div1);
+
+                source.appendChild(ele);
+
+            }
+
+            else{
+                console.log('Error uploading file.');
+            }
+            
+        }
+
+        // CODE FOR DELETING AN IMAGE
+        async function removefun(idvalue){
+            const response = await fetch(`/delete-file?fileName=${idvalue}`, {
+                    method: 'DELETE'
+                    });
+            if(response.ok)
+            {
+                var element = document.getElementById(idvalue);
+                if (element) {
+                    element.parentNode.removeChild(element);
+                }
+            }
+        }
+
+        // code for poping up the image
+        document.querySelectorAll(".details img").forEach(image => {
+            image.onclick = () =>{
+                document.querySelector(".pop-up").style.display = 'block';
+                document.querySelector(".pop-up img").src = image.getAttribute('src');
+            }
+        })
+
+        // for closing the pop-up
+        document.querySelector(".pop-up span").onclick = () => {
+            document.querySelector(".pop-up").style.display = 'none';
+        }
+    </script>
+</body>
+</html>
