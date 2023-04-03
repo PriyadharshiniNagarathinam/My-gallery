@@ -2,11 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
-    <!-- In the HTML head section, you can add the following meta tag to reload the page after 1 second: -->
-    <!-- <meta http-equiv="refresh" content="1"> -->
-    <!-- This will automatically refresh the page after 1 second, so that the newly uploaded image appears in the gallery.-->
-
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Viewer</title>
@@ -16,6 +11,7 @@
             margin:0;
             box-sizing: border-box;
         }
+        
         .details{
             height:350px;
             width: 300px;
@@ -23,6 +19,7 @@
             position:relative;
             overflow: hidden;
         }
+        
         .details img{
             height:350px;
             width:300px;
@@ -46,6 +43,7 @@
         .details:hover img{
             transform: scale(1.1);
         }
+        
         .details:hover .bottom{
             bottom:0;
         }
@@ -157,10 +155,10 @@
 
         <h1>Photo Gallery</h1>
 
-    <button class="uploadButton">
-        <label for="input-file">Upload Images</label>
-        <input type="file" accept="image/png, image/jpg, image/jpeg" id="input-file">
-    </button>
+        <button class="uploadButton">
+             <label for="input-file">Upload Images</label>
+             <input type="file" accept="image/png, image/jpg, image/jpeg" id="input-file">
+        </button>
 
     </section>
 
@@ -180,6 +178,7 @@
         </div>
     {% endfor %}
     </section>
+    
     <section class="two">
             <!-- Pop-up image -->
             <div class="pop-up">
@@ -187,6 +186,7 @@
                 <img src="" alt="">
             </div>
     </section>
+    
     <script>
         let yourInput = document.getElementById("input-file");
 
