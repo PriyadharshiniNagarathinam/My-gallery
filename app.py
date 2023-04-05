@@ -9,7 +9,7 @@ app = Flask(__name__)
 def indexfun():
     allimages = []
     
-    for fileName in os.listdir(r'static'):
+    for fileName in os.listdir(r'https://image-viewer-czix.onrender.com/static'):
         allimages.append(os.path.join(fileName))
     
     return render_template("index.html",imageList=allimages)
